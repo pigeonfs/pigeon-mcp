@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "pigeon": {
+      "command": "node",
+      "args": ["./src/index.js"],
+      "env": {
+        "PIGEON_API_KEY": "pg_xxxxxxxxx",
+        "PIGEON_BASE_URL": "http://localhost:4005"
+      }
+    }
+  }
+}
