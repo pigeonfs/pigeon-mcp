@@ -15,7 +15,7 @@ if (!apiKey) {
 
 const server = new McpServer({
   name: "pigeon",
-  version: "0.1.0"
+  version: "0.2.0"
 });
 
 server.tool(
@@ -91,6 +91,46 @@ server.tool("trigger_automation", "Run an automation for a recipient", {
 }, async ({ id, ...payload }) =>
   jsonResult(await api("POST", `/api/automations/${id}/trigger`, payload))
 );
+
+server.tool("list_newsletters", "List newsletters and their public page links", {}, async () =>
+  jsonResult(await api("GET", "/api/newsletters"))
+);
+
+server.tool(
+  "create_newsletter",
+  "Create a newsletter subscribe page and return its public url. Does not send an issue.",
+  {
+    name: z.string().describe("Letter name"),
+    from: z
+      .string()
+      .optional()
+      .describe("From address on a verified domain. Defaults to SENDER_EMAIL_ADDRESS."),
+    description: z.string().optional(),
+    design: z
+      .string()
+      .optional()
+      .describe(
+        "paper, butter, ink, sea, tomato, linen, night, postcard, ledger, bloom, signal, harbor, or folio"
+      )
+  },
+  async (args) => {
+    const from = args.from || defaultFrom;
+    if (!from) {
+      return textResult("Provide from or set SENDER_EMAIL_ADDRESS / --sender");
+    }
+    const body = await api("POST", "/api/newsletters", {
+      name: args.name,
+      from,
+      description: args.description,
+      design: args.design
+    });
+    return jsonResult(body);
+  }
+);
+
+server.tool("get_newsletter", "Get one newsletter, including its public url", {
+  id: z.string()
+}, async ({ id }) => jsonResult(await api("GET", `/api/newsletters/${id}`)));
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

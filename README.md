@@ -38,10 +38,38 @@ claude mcp add pigeon \
   -- npx -y github:pigeonfs/pigeon-mcp
 ```
 
+## Grok
+
+Add this to `~/.grok/config.toml`. Use a full-access key when the agent should verify a domain. `PIGEON_BASE_URL` for the hosted app is `https://pigeonfs.com`.
+
+```toml
+[mcp_servers.pigeon]
+command = "npx"
+args = ["-y", "github:pigeonfs/pigeon-mcp"]
+enabled = true
+
+[mcp_servers.pigeon.env]
+PIGEON_API_KEY = "pg_xxxxxxxxx"
+PIGEON_BASE_URL = "https://pigeonfs.com"
+SENDER_EMAIL_ADDRESS = "ada@yourdomain.com"
+```
+
+Then ask Grok to verify the domain, and to create a newsletter. `verify_domain` rechecks DNS. `create_newsletter` returns `url`, the public subscribe page. It does not send an issue.
+
+The same page can be created without the agent:
+
+```bash
+curl -X POST https://pigeonfs.com/api/newsletters \
+  -H "Authorization: Bearer $PIGEON_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Pigeon notes","from":"Pigeon <ada@yourdomain.com>","description":"Notes from the API."}'
+```
+
 ## Tools
 
 - **Emails:** `send_email`, `list_emails`, `get_email`, `cancel_email`
 - **Domains:** `list_domains`, `create_domain`, `verify_domain` (create/verify need a full-access key)
+- **Newsletters:** `list_newsletters`, `create_newsletter`, `get_newsletter`
 - **Contacts:** `create_contact`
 - **Automations:** `trigger_automation`
 
